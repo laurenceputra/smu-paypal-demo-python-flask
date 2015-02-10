@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, abort, jsonify, redirect, request
 from jinja2 import TemplateNotFound
 import paypalrestsdk
 import model
-
+        
 payment = Blueprint('payment', __name__,
                         template_folder='templates')
 
@@ -33,8 +33,6 @@ def create_billing_plan():
 
 @payment.route('/initiate/<plan>', methods=['GET'])
 def initiate_payment(plan):
-    import logging
-    logging.basicConfig(level=logging.INFO)
     plans = model.connection.get(model.plan_model, None)
     if plan in plans:
         address = {
@@ -59,7 +57,22 @@ def initiate_payment(plan):
         'status':'failure'
     })
     
-@payment.route('/execute/<payment_token>', methods=['GET'])
-def execute_billing_agreement(plan):
-    #TODO: Create billing agreement and exec
-    return "plan id is %s" % plan
+@payment.route('/execute/', methods=['GET'])
+def execute_billing_agreement():
+    if 'token' in request.args:
+        token = request.args['token']
+        billing_agreement_response = paypalrestsdk.BillingAgreement.execute(token)
+        if billing_agreement_response.id:
+            return jsonify({
+                'status':'success',
+                'data': {
+                    'id': billing_agreement_response.id
+                }
+            })
+        else:
+            raise Exception("Execute failed")
+    else:
+        raise Exception("Token not found")
+    return ({
+        'status':'failure'
+    })
