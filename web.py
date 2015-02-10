@@ -1,10 +1,13 @@
 from flask import Flask
+import os
 app = Flask(__name__)
 
 from blueprints.config import blueprint_config
 for config in blueprint_config:
     app.register_blueprint(config['class'], url_prefix=config['prefix'])
 
+if 'ENV' in os.environ and os.environ['ENV'] == 'debug':
+    app.config['DEBUG'] = True
 @app.route("/")
 def hello():
     return "Hello World!"

@@ -55,3 +55,4 @@ target/
 
 venv/
 .envvars
+startup.sh
