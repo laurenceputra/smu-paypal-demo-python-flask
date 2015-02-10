@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, abort, jsonify
+from flask import Blueprint, render_template, abort, jsonify, redirect, request
 from jinja2 import TemplateNotFound
 import paypalrestsdk
 import model
@@ -33,11 +33,33 @@ def create_billing_plan():
 
 @payment.route('/initiate/<plan>', methods=['GET'])
 def initiate_payment(plan):
-    #TODO: Create billing agreement and redirect user to approval
-    return "plan id is %s" % plan
+    import logging
+    logging.basicConfig(level=logging.INFO)
+    plans = model.connection.get(model.plan_model, None)
+    if plan in plans:
+        address = {
+            "line1": "1 Temasek Avenue",
+            "line2": "#14-01",
+            "city": "Singapore",
+            "state": "SG",
+            "postal_code": "039192",
+            "country_code": "SG"
+        }
+        plan_id = plans[plan]["id"]
+        agreement_data = model.create_agreement_data(plan, plan_id, address)
+        billing_agreement = paypalrestsdk.BillingAgreement(agreement_data)
+        if billing_agreement.create():
+            for link in billing_agreement.links:
+                if link['rel'] == "approval_url":
+                    return redirect(link["href"])
+        raise Exception("Creating agreement failed")
+    else:
+        raise Exception("Invalid Plan")
+    return jsonify({
+        'status':'failure'
+    })
     
 @payment.route('/execute/<payment_token>', methods=['GET'])
 def execute_billing_agreement(plan):
     #TODO: Create billing agreement and exec
     return "plan id is %s" % plan
-
