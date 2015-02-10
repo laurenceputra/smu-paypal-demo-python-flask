@@ -8,6 +8,11 @@ payment = Blueprint('payment', __name__,
 def index():
     return "payment page!"
 
+@payment.route('/createplan', methods=['GET'])
+def create_billing_plan():
+    #TODO sets up the billing plans for the application
+    return "payment page!"
+
 @payment.route('/initiate/<plan>', methods=['GET'])
 def initiate_payment(plan):
     #TODO: Create billing agreement and redirect user to approval
