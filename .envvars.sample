@@ -1,0 +1,6 @@
+!#/bin/bash
+#rename this to .envvars and enter your values below
+
+export PAYPAL_MODE=sandbox
+export PAYPAL_CLIENT_ID=EBWKjlELKMYqRNQ6sYvFo64FtaRLRR5BdHEESmha49TM
+export PAYPAL_CLIENT_SECRET=EO422dn3gQLgDbuwqTjzrFgFtaRLRR5BdHEESmha49TM
